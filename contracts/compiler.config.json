@@ -1,0 +1,8 @@
+{
+  "contract": "proofy.compact",
+  "target": "compact-zk-v0.20",
+  "optimization": "O3",
+  "proof_system": "zk-snark-halo2",
+  "export_witness_bindings": true,
+  "output_dir": "./build"
+}
