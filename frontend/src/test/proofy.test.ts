@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { computeNullifier, computeIdentityCommitment, sha256 } from '../lib/crypto';
+import { computeNullifier } from '../lib/crypto';
 import { MidnightClient } from '../lib/midnight-client';
-import { Gate, UserVaultData } from '../types';
+import { Gate } from '../types';
 
 describe('Proofy Midnight ZK Protocol Test Suite', () => {
   const currentYear = 2026;
