@@ -1,0 +1,200 @@
+// Proofy: Zero-Knowledge Age & Eligibility Gate Smart Contract
+// Platform: Midnight Network
+// Language: Compact (.compact)
+// Description: Allows users to prove age, financial, or credential thresholds without revealing underlying private values.
+
+pragma language_version >= 0.20.0;
+
+// ==========================================
+// 1. DATA STRUCTURES & TYPES
+// ==========================================
+
+export enum GateType {
+    AGE_THRESHOLD,      // Proves: (CurrentYear - BirthYear) >= RequiredAge
+    BALANCE_THRESHOLD,  // Proves: SecretBalance >= RequiredBalance
+    CREDENTIAL_SCORE,   // Proves: SecretScore >= RequiredScore
+    MEMBERSHIP_TIER     // Proves: SecretTier >= RequiredTier
+}
+
+export struct GateConfig {
+    gate_id: Bytes<32>,
+    creator: Bytes<32>,
+    gate_type: GateType,
+    min_threshold: Uint<32>,
+    name_hash: Bytes<32>,
+    is_active: Boolean,
+    total_verifications: Uint<32>
+}
+
+export struct VerificationRecord {
+    nullifier: Bytes<32>,
+    gate_id: Bytes<32>,
+    verified_at_epoch: Uint<32>,
+    is_valid: Boolean
+}
+
+// ==========================================
+// 2. PUBLIC ON-CHAIN LEDGER STATE
+// ==========================================
+
+// Registry of all registered eligibility gates
+export ledger gates: Map<Bytes<32>, GateConfig>;
+
+// Set of generated nullifiers to prevent replay attacks and track verified users
+export ledger verifications: Map<Bytes<32>, VerificationRecord>;
+
+// Protocol stats
+export ledger total_gates_created: Uint<32>;
+export ledger total_proofs_verified: Uint<32>;
+export ledger contract_admin: Bytes<32>;
+
+// Constructor to initialize the contract
+constructor(admin_pubkey: Bytes<32>) {
+    contract_admin = admin_pubkey;
+    total_gates_created = 0;
+    total_proofs_verified = 0;
+}
+
+// ==========================================
+// 3. PRIVATE WITNESS DECLARATIONS (Local Client)
+// ==========================================
+
+// Private inputs supplied by the user's wallet / credential vault (NEVER exposed to the ledger)
+witness get_secret_value(): Uint<32>;
+witness get_user_secret_salt(): Bytes<32>;
+witness get_user_identity_commitment(): Bytes<32>;
+
+// ==========================================
+// 4. SMART CONTRACT CIRCUITS / TRANSITIONS
+// ==========================================
+
+/**
+ * Register a new ZK Eligibility Gate on-chain.
+ * Can be called by any dApp, DAO, or enterprise needing gatekeeping.
+ */
+export circuit create_gate(
+    gate_id: Bytes<32>,
+    gate_type: GateType,
+    min_threshold: Uint<32>,
+    name_hash: Bytes<32>,
+    creator_pubkey: Bytes<32>
+): Void {
+    // Ensure gate does not already exist
+    assert !gates.member(gate_id) "Proofy: Gate ID already exists";
+    assert min_threshold > 0 "Proofy: Threshold must be greater than zero";
+
+    const new_gate = GateConfig {
+        gate_id: gate_id,
+        creator: creator_pubkey,
+        gate_type: gate_type,
+        min_threshold: min_threshold,
+        name_hash: name_hash,
+        is_active: true,
+        total_verifications: 0
+    };
+
+    gates.insert(gate_id, new_gate);
+    total_gates_created = total_gates_created + 1;
+}
+
+/**
+ * Generate a Zero-Knowledge Proof and verify eligibility against a Gate.
+ * 
+ * - The user passes the gate_id and current time parameter (epoch/year).
+ * - The client-side Compact runtime executes the witness to fetch the private secret.
+ * - The ZK circuit verifies that the secret meets or exceeds the gate's min_threshold.
+ * - Generates a deterministic nullifier = Hash(gate_id, user_identity_salt) to record proof
+ *   without revealing the user's address or raw value.
+ */
+export circuit verify_eligibility(
+    gate_id: Bytes<32>,
+    current_epoch_or_year: Uint<32>
+): Bytes<32> {
+    // 1. Fetch public gate configuration from on-chain ledger
+    assert gates.member(gate_id) "Proofy: Gate does not exist";
+    const gate = gates.lookup(gate_id);
+    assert gate.is_active "Proofy: Gate is currently deactivated";
+
+    // 2. Fetch private witness values from local user storage
+    const secret_raw_val = get_secret_value();
+    const user_salt = get_user_secret_salt();
+    const user_identity = get_user_identity_commitment();
+
+    // 3. ZERO-KNOWLEDGE CONSTRAINTS: Validate threshold based on gate type
+    if (gate.gate_type == GateType.AGE_THRESHOLD) {
+        // For Age Gate: secret_raw_val is birth_year (e.g., 1998)
+        // User age = current_epoch_or_year - birth_year
+        assert current_epoch_or_year >= secret_raw_val "Proofy: Invalid birth year in future";
+        const calculated_age = current_epoch_or_year - secret_raw_val;
+        assert calculated_age >= gate.min_threshold "Proofy: Age does not meet required threshold";
+    } else {
+        // For Balance / Score / Tier gates: direct threshold comparison
+        assert secret_raw_val >= gate.min_threshold "Proofy: Value does not meet required threshold";
+    }
+
+    // 4. Compute unique deterministic nullifier for this user + gate pair
+    // This allows single verification per gate without linking to other gates or leaking identity
+    const nullifier = persistent_hash<Vector<3, Bytes<32>>>([
+        gate_id,
+        user_salt,
+        user_identity
+    ]);
+
+    // 5. Check if already verified (or record fresh verification)
+    assert !verifications.member(nullifier) "Proofy: Pass already issued for this identity";
+
+    const record = VerificationRecord {
+        nullifier: nullifier,
+        gate_id: gate_id,
+        verified_at_epoch: current_epoch_or_year,
+        is_valid: true
+    };
+
+    verifications.insert(nullifier, record);
+
+    // 6. Update gate statistics on public ledger
+    const updated_gate = GateConfig {
+        gate_id: gate.gate_id,
+        creator: gate.creator,
+        gate_type: gate.gate_type,
+        min_threshold: gate.min_threshold,
+        name_hash: gate.name_hash,
+        is_active: gate.is_active,
+        total_verifications: gate.total_verifications + 1
+    };
+    gates.insert(gate_id, updated_gate);
+    total_proofs_verified = total_proofs_verified + 1;
+
+    // Return the on-chain verifiable nullifier
+    return nullifier;
+}
+
+/**
+ * Public query circuit for third-party dApps to check if a nullifier/badge is valid.
+ */
+export circuit check_badge_validity(nullifier: Bytes<32>, gate_id: Bytes<32>): Boolean {
+    if (!verifications.member(nullifier)) {
+        return false;
+    }
+    const record = verifications.lookup(nullifier);
+    return record.is_valid && record.gate_id == gate_id;
+}
+
+/**
+ * Admin circuit to deactivate a gate if needed.
+ */
+export circuit set_gate_status(gate_id: Bytes<32>, is_active: Boolean): Void {
+    assert gates.member(gate_id) "Proofy: Gate not found";
+    const gate = gates.lookup(gate_id);
+    
+    const updated_gate = GateConfig {
+        gate_id: gate.gate_id,
+        creator: gate.creator,
+        gate_type: gate.gate_type,
+        min_threshold: gate.min_threshold,
+        name_hash: gate.name_hash,
+        is_active: is_active,
+        total_verifications: gate.total_verifications
+    };
+    gates.insert(gate_id, updated_gate);
+}
