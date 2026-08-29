@@ -147,11 +147,5 @@ export circuit verify_eligibility(gate_id: Bytes<32>, current_epoch_or_year: Uin
     return nullifier;
 }
 ```
-
----
-
-## 👨‍💻 Author & License
-
-- **Author**: [nirbhay677](https://github.com/nirbhay677)
 - **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
-- **License**: MIT
+
