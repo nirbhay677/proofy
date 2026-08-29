@@ -92,10 +92,29 @@ Open `http://localhost:3000` in your browser.
 cd frontend
 
 # Run unit tests (7 tests passing)
-npm test
+npx vitest run --reporter=verbose
 
 # Production build check
 npm run build
+```
+
+### ✅ Test Suite Output (7/7 Passing):
+
+```text
+ RUN  v3.2.7 C:/Users/n7282/.gemini/antigravity/scratch/proofy/frontend
+
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 1: Should successfully pass 18+ Age Gate when user is eligible (Age >= 18) 1ms
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 2: Should reject 18+ Age Gate proof when user is underage without leaking raw DOB 0ms
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 3: Should verify liquid balance threshold ($10k+) without exposing total balance 0ms
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 4: Should reject accredited investor gate when balance is below threshold 0ms
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 5: Should generate identical nullifier for the same gate and user identity 6ms
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 6: Should generate completely distinct, unlinkable nullifiers across different gates 1ms
+ ✓ src/test/proofy.test.ts > Proofy Midnight ZK Protocol Test Suite > TEST 7: Full Compact proof execution pipeline correctly records on-chain pass 3464ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  15:45:48
+   Duration  4.47s
 ```
 
 ---
