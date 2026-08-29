@@ -1,4 +1,4 @@
-# 🛡️ Proofy — Zero-Knowledge Age & Eligibility Gate on Midnight
+# Proofy — Zero-Knowledge Age & Eligibility Gate on Midnight
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-proofy--six.vercel.app-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://proofy-six.vercel.app)
 [![CI Pipeline](https://github.com/nirbhay677/proofy/actions/workflows/ci.yml/badge.svg)](https://github.com/nirbhay677/proofy/actions)
@@ -7,30 +7,22 @@
 ![License](https://img.shields.io/badge/License-MIT-emerald)
 ![Tests Passing](https://img.shields.io/badge/Tests-7%20Passed-brightgreen)
 
-> **"Prove you qualify without revealing your raw data."**
-
-🔗 **Live Application URL**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)  
-*(Alternative mirror: [https://proofy-bocf.vercel.app](https://proofy-bocf.vercel.app))*
-
-**Proofy** is a privacy-first Zero-Knowledge eligibility protocol built for the **Midnight Network** using the **Compact** smart contract language. It enables users to prove age requirements (e.g. 18+, 21+), accredited investor thresholds ($10k+ liquid balance), credit scores, and DAO membership tiers to third-party applications and physical checkpoints **without disclosing birthdates, bank balances, or personal identities**.
+**Proofy** is a privacy-first Zero-Knowledge eligibility gate built on the **Midnight Network** using the **Compact** smart contract language. It allows users to cryptographically prove age (18+, 21+), financial accreditation ($10k+ liquid balance), credit scores, and DAO membership tiers without ever exposing birthdates, account balances, or personal identities.
 
 ---
 
-## 📋 1. Product Proposal (Idea #2 from Provided List)
+## 🌟 What This Project Demonstrates
 
-* **Selected Idea**: **Age / Eligibility Gate** — *Prove a threshold without revealing the underlying value*.
-* **Product Name**: **Proofy**
-* **Target Audience**: 
-  - **DeFi & Prediction Markets**: Requiring 18+/21+ compliance without collecting user PII.
-  - **Private Lending & Whales**: Requiring proof of liquidity ($\ge \$10,000$) or creditworthiness ($\ge 700$) without public wallet/balance doxxing.
-  - **DAOs & Gated Communities**: Enforcing membership tier access without exposing member address lists.
-* **Value Proposition**: Replaces centralized KYC and invasive document uploads with cryptographic, client-side Zero-Knowledge proofs powered by Midnight's dual-state architecture.
+- **Midnight Dual-State Architecture**: Separates private client-side witness evaluation from public ledger state.
+- **Zero-Knowledge Threshold Proofs**: Proves `secret >= threshold` in Compact without revealing the underlying secret value.
+- **Sybil-Resistant Nullifiers**: Deterministic hashing prevents double-claiming while preserving cross-gate unlinkability.
+- **Encrypted Local Vault**: Client-side credential management with zero network leakage.
+- **Third-Party Verifier Terminal**: Query on-chain nullifier passes in real time.
+- **Automated CI/CD Pipeline**: GitHub Actions running unit tests (Vitest) and production builds.
 
 ---
 
-## 🔒 2. Privacy Model: What an Observer Can & Cannot Learn
-
-Midnight’s unique dual-state execution separates private witness logic (computed on the user's device) from public ledger state updates.
+## 🔒 Privacy Model: What an Observer Can & Cannot Learn
 
 | Data Point | What an On-Chain Observer **CAN** Learn | What an On-Chain Observer **CANNOT** Learn |
 |---|:---:|:---:|
@@ -39,7 +31,7 @@ Midnight’s unique dual-state execution separates private witness logic (comput
 | **Liquid Bank / Wallet Balance** | ❌ None | 🔒 **Completely Hidden** *(Raw balance never touches ledger)* |
 | **Credit / DeFi Score** | ❌ None | 🔒 **Completely Hidden** |
 | **User Wallet Identity / Address** | ❌ Unlinked | 🔒 **Completely Hidden** *(Protected by deterministic nullifier)* |
-| **Cross-Gate Linkability** | ❌ Unlinkable | 🔒 **Completely Hidden** *(Unique salt produces distinct nullifiers per gate)* |
+| **Cross-Gate Linkability** | ❌ Unlinkable | 🔒 **Completely Hidden** *(Unique salt per gate)* |
 | **Target Gate ID & Threshold** | ✅ **Visible** *(Public configuration)* | — |
 | **Verification Validity** | ✅ **Visible** *(Pass = `true`)* | — |
 | **Proof Timestamp / Block Height**| ✅ **Visible** *(On-chain timestamp)* | — |
@@ -47,149 +39,73 @@ Midnight’s unique dual-state execution separates private witness logic (comput
 
 ---
 
-## 🏛️ 3. Protocol Architecture & Compact Smart Contract
+## 🛠️ Tech Stack
 
-```
-+--------------------------------------------------------------------------------+
-|                         USER LOCAL BROWSER (PRIVATE VAULT)                     |
-|  - Birth Year: 1999 (Confidential)                                             |
-|  - Portfolio Balance: $25,000 (Confidential)                                   |
-|  - Identity Salt: 0x8a92... (Secret)                                           |
-+---------------------------------------+----------------------------------------+
-                                        |
-                                        v  [Client-side Compact Runtime]
-+--------------------------------------------------------------------------------+
-|                           COMPACT ZK CIRCUIT EVALUATION                        |
-|                                                                                |
-|  1. Evaluates: (2026 - 1999) = 27 >= 18  --> [CONSTRAINT SATISFIED]             |
-|  2. Computes: Nullifier = SHA-256(GateID || UserSalt || IdentityCommitment)     |
-|  3. Synthesizes ZK Proof (π) locally via Halo2 proof system                    |
-+---------------------------------------+----------------------------------------+
-                                        |
-                                        v  [Submits ZK Transaction (0 PII Exposed)]
-+--------------------------------------------------------------------------------+
-|                              MIDNIGHT PUBLIC LEDGER                            |
-|  - Gate Registry: ID, Threshold, Total Verifications                           |
-|  - Verifications Ledger: Records Nullifier -> Status: VALID                    |
-|  - Third-party dApps query: `check_badge_validity(nullifier, gate_id)`         |
-+--------------------------------------------------------------------------------+
-```
+- **Smart Contract**: Midnight Compact (v0.20+)
+- **ZK Proof System**: Halo2 / Compact ZK Runtime
+- **Frontend**: React 18, Vite 6, TypeScript
+- **Styling**: Tailwind CSS
+- **Cryptography**: Browser Web Crypto API (SHA-256 / Deterministic Nullifiers)
+- **Testing**: Vitest (7 unit tests passing)
+- **CI/CD**: GitHub Actions
 
 ---
 
-## 📂 4. Project Structure
+## 📂 Project Structure
 
-```
-proofy/
-├── .github/
-│   └── workflows/
-│       └── ci.yml             # GitHub Actions CI/CD pipeline (Tests + Build)
-├── contracts/
-│   ├── proofy.compact         # Midnight Compact smart contract
-│   ├── compiler.config.json   # Compact compiler configuration
-│   └── test/
-│       └── proofy.test.ts     # Compact circuit tests
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Navbar.tsx             # Header with Midnight wallet status & DUST
-│   │   │   ├── Hero.tsx               # Protocol value proposition
-│   │   │   ├── StatsBar.tsx           # Live on-chain metrics
-│   │   │   ├── CredentialVault.tsx    # Encrypted local vault with test presets
-│   │   │   ├── GateCatalog.tsx        # Filterable catalog of active ZK gates
-│   │   │   ├── ZkProofModal.tsx       # 5-step visual ZK proof synthesizer
-│   │   │   ├── VerificationBadge.tsx  # Verifiable pass with QR & JSON export
-│   │   │   ├── VerifierTerminal.tsx   # Third-party dApp query terminal
-│   │   │   ├── CreateGateModal.tsx    # Deploy custom gates on Midnight
-│   │   │   └── ContractViewer.tsx     # In-app Compact code browser
-│   │   ├── lib/
-│   │   │   ├── midnight-client.ts     # Compact runtime simulator & ledger store
-│   │   │   └── crypto.ts              # Web Crypto SHA-256 & nullifier derivation
-│   │   ├── test/
-│   │   │   └── proofy.test.ts         # 7 Passing Vitest unit tests
-│   │   ├── types/
-│   │   │   └── index.ts               # TypeScript interfaces
-│   │   ├── App.tsx                    # Main layout & tab router
-│   │   ├── main.tsx                   # React entry point
-│   │   └── index.css                  # Dark mode glassmorphism styles
-│   ├── package.json
-│   ├── vite.config.ts
-│   ├── vercel.json
-│   └── tailwind.config.js
-└── README.md
-```
+- `contracts/proofy.compact`: Compact smart contract defining public ledgers, private witnesses, and ZK circuits
+- `contracts/compiler.config.json`: Compact compiler configuration
+- `frontend/src/components/CredentialVault.tsx`: Encrypted browser vault with quick test profiles
+- `frontend/src/components/GateCatalog.tsx`: Filterable catalog of active ZK eligibility gates
+- `frontend/src/components/ZkProofModal.tsx`: 5-step visual ZK proof synthesizer modal
+- `frontend/src/components/VerificationBadge.tsx`: Verifiable digital ZK pass with QR code and JSON receipt
+- `frontend/src/components/VerifierTerminal.tsx`: Portal for third-party dApps to query on-chain nullifiers
+- `frontend/src/components/ContractViewer.tsx`: In-app Compact smart contract source code browser
+- `frontend/src/lib/midnight-client.ts`: Midnight Compact runtime simulator and ledger state machine
+- `frontend/src/lib/crypto.ts`: Cryptographic hashing and deterministic nullifier derivation
+- `frontend/src/test/proofy.test.ts`: Vitest test suite with 7 passing tests
+- `.github/workflows/ci.yml`: Automated CI/CD pipeline for tests and build verification
 
 ---
 
-## 🧪 5. Test Suite & Verification (7 Tests Passing)
+## 🚀 Local Development
 
-To run the unit test suite:
 ```bash
-cd frontend
-npm test
-```
+# 1. Clone repository
+git clone https://github.com/nirbhay677/proofy.git
+cd proofy/frontend
 
-### ✅ Test Output:
-```
- ✓ src/test/proofy.test.ts (7 tests) 3465ms
-   ✓ TEST 1: Should successfully pass 18+ Age Gate when user is eligible (Age >= 18)
-   ✓ TEST 2: Should reject 18+ Age Gate proof when user is underage without leaking raw DOB
-   ✓ TEST 3: Should verify liquid balance threshold ($10k+) without exposing total balance
-   ✓ TEST 4: Should reject accredited investor gate when balance is below threshold
-   ✓ TEST 5: Should generate identical nullifier for the same gate and user identity
-   ✓ TEST 6: Should generate completely distinct, unlinkable nullifiers across different gates
-   ✓ TEST 7: Full Compact proof execution pipeline correctly records on-chain pass
-
- Test Files  1 passed (1)
-      Tests  7 passed (7)
-```
-
----
-
-## 🚀 6. Quickstart & Live Demo
-
-### 🌐 Live Demo URL
-Access the live deployed dApp directly in your browser:  
-👉 **[https://proofy-six.vercel.app](https://proofy-six.vercel.app)**
-
-### 💻 Local Setup
-```bash
-# 1. Install Dependencies
-cd frontend
+# 2. Install dependencies
 npm install
 
-# 2. Launch Local Development Server
+# 3. Start development server
 npm run dev
+```
 
-# 3. Production Build
+Open `http://localhost:3000` in your browser.
+
+---
+
+## 🧪 Quality Checks & Testing
+
+```bash
+cd frontend
+
+# Run unit tests (7 tests passing)
+npm test
+
+# Production build check
 npm run build
 ```
 
 ---
 
-## 🎥 7. 1-Minute Demo Video Walkthrough Script
-
-| Time | Scene | Action / Voiceover |
-|---|---|---|
-| **0:00 - 0:15** | **Introduction & Problem** | *"Welcome to Proofy, a privacy-preserving eligibility gate on Midnight Network. Today, passing KYC or age gates forces you to reveal your birthdate or bank balance. Proofy fixes this with Zero-Knowledge proofs."* |
-| **0:15 - 0:30** | **Private Vault** | *"In the Private Vault, our credentials (DOB: 1999, Balance: $25,000) remain strictly in encrypted local memory. Let's select the 🧑 Adult profile."* |
-| **0:30 - 0:45** | **ZK Proof Generation** | *"We go to Explore Gates and click 'Prove Eligibility' on the 18+ Age Gate. Midnight's Compact circuit verifies (2026 - 1999) = 27 >= 18, generates a cryptographic nullifier, and issues a verified pass with 0 bytes of private data leaked."* |
-| **0:45 - 0:55** | **Underage Rejection** | *"If we switch to the 🧒 Underage profile (Age 15) and attempt to verify, the circuit constraint fails immediately on the client device without revealing our age."* |
-| **0:55 - 1:00** | **Verifier Terminal** | *"Third-party dApps can query our nullifier in the Verifier Terminal to confirm our validity on Midnight's ledger in milliseconds."* |
-
----
-
-## 📜 8. Compact Smart Contract (`contracts/proofy.compact`)
+## 📜 Compact Smart Contract Overview
 
 ```compact
 pragma language_version >= 0.20.0;
 
-export enum GateType {
-    AGE_THRESHOLD,
-    BALANCE_THRESHOLD,
-    CREDENTIAL_SCORE,
-    MEMBERSHIP_TIER
-}
+export enum GateType { AGE_THRESHOLD, BALANCE_THRESHOLD, CREDENTIAL_SCORE, MEMBERSHIP_TIER }
 
 export struct GateConfig {
     gate_id: Bytes<32>,
@@ -208,10 +124,7 @@ witness get_secret_value(): Uint<32>;
 witness get_user_secret_salt(): Bytes<32>;
 witness get_user_identity_commitment(): Bytes<32>;
 
-export circuit verify_eligibility(
-    gate_id: Bytes<32>,
-    current_epoch_or_year: Uint<32>
-): Bytes<32> {
+export circuit verify_eligibility(gate_id: Bytes<32>, current_epoch_or_year: Uint<32>): Bytes<32> {
     assert gates.member(gate_id) "Proofy: Gate does not exist";
     const gate = gates.lookup(gate_id);
 
@@ -219,6 +132,7 @@ export circuit verify_eligibility(
     const user_salt = get_user_secret_salt();
     const user_identity = get_user_identity_commitment();
 
+    // Enforce threshold constraint
     if (gate.gate_type == GateType.AGE_THRESHOLD) {
         assert current_epoch_or_year >= secret_raw_val;
         const calculated_age = current_epoch_or_year - secret_raw_val;
@@ -227,29 +141,17 @@ export circuit verify_eligibility(
         assert secret_raw_val >= gate.min_threshold;
     }
 
-    const nullifier = persistent_hash<Vector<3, Bytes<32>>>([
-        gate_id,
-        user_salt,
-        user_identity
-    ]);
-
-    verifications.insert(nullifier, VerificationRecord {
-        nullifier: nullifier,
-        gate_id: gate_id,
-        verified_at_epoch: current_epoch_or_year,
-        is_valid: true
-    });
-
+    // Derive deterministic nullifier
+    const nullifier = persistent_hash<Vector<3, Bytes<32>>>([gate_id, user_salt, user_identity]);
+    verifications.insert(nullifier, VerificationRecord { nullifier: nullifier, gate_id: gate_id, verified_at_epoch: current_epoch_or_year, is_valid: true });
     return nullifier;
 }
 ```
 
 ---
 
-## 👨‍💻 9. Author & Submission
+## 👨‍💻 Author & License
 
-* **Author**: [nirbhay677](https://github.com/nirbhay677)
-* **GitHub Repo**: [https://github.com/nirbhay677/proofy](https://github.com/nirbhay677/proofy)
-* **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
-* **CI/CD Status**: [Passing](https://github.com/nirbhay677/proofy/actions)
-* **License**: MIT
+- **Author**: [nirbhay677](https://github.com/nirbhay677)
+- **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
+- **License**: MIT
