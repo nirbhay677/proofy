@@ -4,8 +4,8 @@
 [![CI Pipeline](https://github.com/nirbhay677/proofy/actions/workflows/ci.yml/badge.svg)](https://github.com/nirbhay677/proofy/actions)
 ![Network](https://img.shields.io/badge/Network-Midnight%20ZK-6366f1)
 ![Smart Contract](https://img.shields.io/badge/Language-Compact%20v0.20-14b8a6)
-![License](https://img.shields.io/badge/License-MIT-emerald)
 ![Tests Passing](https://img.shields.io/badge/Tests-7%20Passed-brightgreen)
+
 
 **Proofy** is a privacy-first Zero-Knowledge eligibility gate built on the **Midnight Network** using the **Compact** smart contract language. It allows users to cryptographically prove age (18+, 21+), financial accreditation ($10k+ liquid balance), credit scores, and DAO membership tiers without ever exposing birthdates, account balances, or personal identities.
 
@@ -68,36 +68,6 @@
 
 ---
 
-## 🚀 Local Development
-
-```bash
-# 1. Clone repository
-git clone https://github.com/nirbhay677/proofy.git
-cd proofy/frontend
-
-# 2. Install dependencies
-npm install
-
-# 3. Start development server
-npm run dev
-```
-
-Open `http://localhost:3000` in your browser.
-
----
-
-## 🧪 Quality Checks & Testing
-
-```bash
-cd frontend
-
-# Run unit tests (7 tests passing)
-npx vitest run --reporter=verbose
-
-# Production build check
-npm run build
-```
-
 ### ✅ Test Suite Output (7/7 Passing):
 
 ```text
@@ -117,54 +87,5 @@ npm run build
    Duration  4.47s
 ```
 
----
-
-## 📜 Compact Smart Contract Overview
-
-```compact
-pragma language_version >= 0.20.0;
-
-export enum GateType { AGE_THRESHOLD, BALANCE_THRESHOLD, CREDENTIAL_SCORE, MEMBERSHIP_TIER }
-
-export struct GateConfig {
-    gate_id: Bytes<32>,
-    creator: Bytes<32>,
-    gate_type: GateType,
-    min_threshold: Uint<32>,
-    name_hash: Bytes<32>,
-    is_active: Boolean,
-    total_verifications: Uint<32>
-}
-
-export ledger gates: Map<Bytes<32>, GateConfig>;
-export ledger verifications: Map<Bytes<32>, VerificationRecord>;
-
-witness get_secret_value(): Uint<32>;
-witness get_user_secret_salt(): Bytes<32>;
-witness get_user_identity_commitment(): Bytes<32>;
-
-export circuit verify_eligibility(gate_id: Bytes<32>, current_epoch_or_year: Uint<32>): Bytes<32> {
-    assert gates.member(gate_id) "Proofy: Gate does not exist";
-    const gate = gates.lookup(gate_id);
-
-    const secret_raw_val = get_secret_value();
-    const user_salt = get_user_secret_salt();
-    const user_identity = get_user_identity_commitment();
-
-    // Enforce threshold constraint
-    if (gate.gate_type == GateType.AGE_THRESHOLD) {
-        assert current_epoch_or_year >= secret_raw_val;
-        const calculated_age = current_epoch_or_year - secret_raw_val;
-        assert calculated_age >= gate.min_threshold;
-    } else {
-        assert secret_raw_val >= gate.min_threshold;
-    }
-
-    // Derive deterministic nullifier
-    const nullifier = persistent_hash<Vector<3, Bytes<32>>>([gate_id, user_salt, user_identity]);
-    verifications.insert(nullifier, VerificationRecord { nullifier: nullifier, gate_id: gate_id, verified_at_epoch: current_epoch_or_year, is_valid: true });
-    return nullifier;
-}
-```
+- CI-CD: <img width="1897" height="903" alt="Screenshot 2026-08-29 155520" src="https://github.com/user-attachments/assets/336f4558-7ec1-49d0-8e8d-8fee49a6a318" />
 - **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
-
