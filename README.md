@@ -96,5 +96,4 @@
 - **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
 - **Demo Video (1 min)**: [Watch on Google Drive](https://drive.google.com/file/d/1p2Gr3f12NGHSOBOuWSedbdz1LFkXsbgO/view?usp=sharing)
 - **CI/CD Pipeline**: [Passing Runs on GitHub Actions](https://github.com/nirbhay677/proofy/actions)
-- **Author**: [nirbhay677](https://github.com/nirbhay677)
-- **License**: MIT
+  
