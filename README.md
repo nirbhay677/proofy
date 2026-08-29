@@ -1,11 +1,11 @@
 # Proofy — Zero-Knowledge Age & Eligibility Gate on Midnight
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-proofy--six.vercel.app-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://proofy-six.vercel.app)
+[![Demo Video](https://img.shields.io/badge/Demo%20Video-Google%20Drive-FF5722?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1p2Gr3f12NGHSOBOuWSedbdz1LFkXsbgO/view?usp=sharing)
 [![CI Pipeline](https://github.com/nirbhay677/proofy/actions/workflows/ci.yml/badge.svg)](https://github.com/nirbhay677/proofy/actions)
 ![Network](https://img.shields.io/badge/Network-Midnight%20ZK-6366f1)
 ![Smart Contract](https://img.shields.io/badge/Language-Compact%20v0.20-14b8a6)
 ![Tests Passing](https://img.shields.io/badge/Tests-7%20Passed-brightgreen)
-
 
 **Proofy** is a privacy-first Zero-Knowledge eligibility gate built on the **Midnight Network** using the **Compact** smart contract language. It allows users to cryptographically prove age (18+, 21+), financial accreditation ($10k+ liquid balance), credit scores, and DAO membership tiers without ever exposing birthdates, account balances, or personal identities.
 
@@ -68,6 +68,8 @@
 
 ---
 
+## 🧪 Quality Checks & Testing
+
 ### ✅ Test Suite Output (7/7 Passing):
 
 ```text
@@ -87,5 +89,12 @@
    Duration  4.47s
 ```
 
-- CI-CD: <img width="1897" height="903" alt="Screenshot 2026-08-29 155520" src="https://github.com/user-attachments/assets/336f4558-7ec1-49d0-8e8d-8fee49a6a318" />
+---
+
+## 🔗 Links & Submission
+
 - **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
+- **Demo Video (1 min)**: [Watch on Google Drive](https://drive.google.com/file/d/1p2Gr3f12NGHSOBOuWSedbdz1LFkXsbgO/view?usp=sharing)
+- **CI/CD Pipeline**: [Passing Runs on GitHub Actions](https://github.com/nirbhay677/proofy/actions)
+- **Author**: [nirbhay677](https://github.com/nirbhay677)
+- **License**: MIT
