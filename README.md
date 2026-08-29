@@ -1,5 +1,6 @@
 # 🛡️ Proofy — Zero-Knowledge Age & Eligibility Gate on Midnight
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-proofy--six.vercel.app-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://proofy-six.vercel.app)
 [![CI Pipeline](https://github.com/nirbhay677/proofy/actions/workflows/ci.yml/badge.svg)](https://github.com/nirbhay677/proofy/actions)
 ![Network](https://img.shields.io/badge/Network-Midnight%20ZK-6366f1)
 ![Smart Contract](https://img.shields.io/badge/Language-Compact%20v0.20-14b8a6)
@@ -7,6 +8,9 @@
 ![Tests Passing](https://img.shields.io/badge/Tests-7%20Passed-brightgreen)
 
 > **"Prove you qualify without revealing your raw data."**
+
+🔗 **Live Application URL**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)  
+*(Alternative mirror: [https://proofy-bocf.vercel.app](https://proofy-bocf.vercel.app))*
 
 **Proofy** is a privacy-first Zero-Knowledge eligibility protocol built for the **Midnight Network** using the **Compact** smart contract language. It enables users to prove age requirements (e.g. 18+, 21+), accredited investor thresholds ($10k+ liquid balance), credit scores, and DAO membership tiers to third-party applications and physical checkpoints **without disclosing birthdates, bank balances, or personal identities**.
 
@@ -110,6 +114,7 @@ proofy/
 │   │   └── index.css                  # Dark mode glassmorphism styles
 │   ├── package.json
 │   ├── vite.config.ts
+│   ├── vercel.json
 │   └── tailwind.config.js
 └── README.md
 ```
@@ -141,22 +146,22 @@ npm test
 
 ---
 
-## 🚀 6. Quickstart & Local Setup
+## 🚀 6. Quickstart & Live Demo
 
-### 1. Install Dependencies
+### 🌐 Live Demo URL
+Access the live deployed dApp directly in your browser:  
+👉 **[https://proofy-six.vercel.app](https://proofy-six.vercel.app)**
+
+### 💻 Local Setup
 ```bash
+# 1. Install Dependencies
 cd frontend
 npm install
-```
 
-### 2. Launch Local Development Server
-```bash
+# 2. Launch Local Development Server
 npm run dev
-```
-Open **`http://localhost:3000`** in your browser.
 
-### 3. Production Build
-```bash
+# 3. Production Build
 npm run build
 ```
 
@@ -241,7 +246,10 @@ export circuit verify_eligibility(
 
 ---
 
-## 👨‍💻 Author & Submission
+## 👨‍💻 9. Author & Submission
+
 * **Author**: [nirbhay677](https://github.com/nirbhay677)
-* **GitHub Repo**: [nirbhay677/proofy](https://github.com/nirbhay677/proofy)
+* **GitHub Repo**: [https://github.com/nirbhay677/proofy](https://github.com/nirbhay677/proofy)
+* **Live Demo**: [https://proofy-six.vercel.app](https://proofy-six.vercel.app)
+* **CI/CD Status**: [Passing](https://github.com/nirbhay677/proofy/actions)
 * **License**: MIT
